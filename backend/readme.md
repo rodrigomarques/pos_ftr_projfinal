@@ -1,4 +1,4 @@
-# Projeto POSGRADUAÇÃO FRT
+# Projeto POSGRADUAÇÃO FTR
 
 ## Tarefas
 - [ ]  O usuário pode criar uma conta e fazer login

@@ -1,8 +1,8 @@
-# Projeto POSGRADUAÇÃO FRT
+# Projeto POSGRADUAÇÃO FTR
 
 ## 📁 Projetos
 
-* Backend: [`backend/README.md`](./backend/README.md)
+* Backend: [`backend/README.md`](./backend/readme.md)
 * Frontend: [`frontend/README.md`](./frontend/README.md)
 
 ---
@@ -11,7 +11,7 @@
 
 Acesse a pasta **backend/** e siga as instruções do README:
 
-👉 [`backend/README.md`](./backend/README.md)
+👉 [`backend/README.md`](./backend/readme.md)
 
 ---
 
