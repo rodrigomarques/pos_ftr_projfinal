@@ -43,13 +43,26 @@ scalar DateTimeISO
 """An arbitrary-precision Decimal type"""
 scalar Decimal
 
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type LoginOutput {
+  refreshToken: String!
+  token: String!
+  user: UserModel!
+}
+
 type Mutation {
   createCategory(data: CreateCategoryInput!): CategoryModel!
   createTransaction(data: CreateTransactionInput!): TransactionModel!
   createUser(data: CreateUserInput!): UserModel!
   deleteCategory(id: String!): Boolean!
   deleteTransaction(id: String!): Boolean!
+  login(data: LoginInput!): LoginOutput!
   updateCategory(data: UpdateCategoryInput!): CategoryModel!
+  updateTransaction(data: UpdateTransactionInput!): TransactionModel!
 }
 
 type Query {
@@ -83,6 +96,15 @@ input UpdateCategoryInput {
   id: String!
   name: String!
   type: TransactionType!
+}
+
+input UpdateTransactionInput {
+  amount: Decimal
+  categoryId: String
+  date: DateTimeISO
+  id: String!
+  title: String
+  type: TransactionType
 }
 
 type UserModel {

@@ -1,11 +1,8 @@
-import { CreateTransactionInput } from '@/dtos/input/transaction'
+import { CreateTransactionInput, UpdateTransactionInput } from '@/dtos/input/transaction'
 import { prismaClient } from '../../prisma/prisma'
-
-let userId = "ffc6dc5b-9a1b-4e23-83d3-ac12bfbf2204"
-
 export class TransactionService {
 
-  async createTransaction(data: CreateTransactionInput) {
+  async createTransaction(data: CreateTransactionInput, userId: string) {
     return await prismaClient.transaction.create({
       data: {
         title: data.title,
@@ -18,7 +15,7 @@ export class TransactionService {
     })
   }
 
-  async listTransactions() {
+  async listTransactions(userId: string) {
     return await prismaClient.transaction.findMany({
       where: {
         userId: userId
@@ -29,11 +26,45 @@ export class TransactionService {
     })
   }
 
-  async deleteTransaction(id: string) {
+  async findTransactionById(id: string, userId: string) {
+    return await prismaClient.transaction.findUnique({
+      where: {
+        id: id,
+        userId: userId
+      },
+      include: { 
+        category: true 
+      }
+    })
+  }
+
+  async deleteTransaction(id: string, userId: string) {
     return await prismaClient.transaction.delete({
       where: {
-        id: id
+        id: id,
+        userId: userId
       }
+    })
+  }
+
+  async updateTransaction(data: UpdateTransactionInput, userId: string) {
+    const transaction = await this.findTransactionById(data.id, userId)
+
+    if (!transaction) {
+      throw new Error('Transaction not found')
+    }
+
+    return await prismaClient.transaction.update({
+      where: {
+        id: data.id
+      },
+      data: {
+        title: data.title ?? transaction.title,
+        amount: data.amount ?? transaction.amount,
+        date: data.date ?? transaction.date,
+        categoryId: data.categoryId ?? transaction.categoryId,
+        type: data.type ?? transaction.type,
+      },
     })
   }
 }

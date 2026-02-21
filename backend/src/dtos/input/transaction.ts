@@ -20,3 +20,25 @@ export class CreateTransactionInput {
   @Field(() => TransactionType)
   type!: TransactionType
 }
+
+
+@InputType()
+export class UpdateTransactionInput {
+  @Field(() => String)
+  id!: string
+
+  @Field(() => String, { nullable: true })
+  title?: string
+
+  @Field(() => GraphQLDecimal, { nullable: true })
+  amount?: Prisma.Decimal
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  date? : Date
+
+  @Field(() => String, { nullable: true })
+  categoryId?: string
+
+  @Field(() => TransactionType, { nullable: true })
+  type?: TransactionType
+}

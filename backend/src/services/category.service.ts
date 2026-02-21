@@ -1,11 +1,10 @@
+import { UUID } from 'node:crypto'
 import { prismaClient } from '../../prisma/prisma'
 import { CreateCategoryInput, UpdateCategoryInput } from '@/dtos/input/category'
 
-let userId = "ffc6dc5b-9a1b-4e23-83d3-ac12bfbf2204"
-
 export class CategoryService {
 
-  async createCategory(data: CreateCategoryInput) {
+  async createCategory(data: CreateCategoryInput, userId: string) {
     const findCategory = await prismaClient.category.findFirst({
       where: {
         name: data.name,
@@ -24,7 +23,7 @@ export class CategoryService {
     })
   }
 
-  async updateCategory(data: UpdateCategoryInput) {
+  async updateCategory(data: UpdateCategoryInput, userId: string) {
     return prismaClient.category.update({
       where: {
         id: data.id,
@@ -38,7 +37,7 @@ export class CategoryService {
     })
   }
 
-  async findCategory(id: string) {
+  async findCategory(id: string, userId: string) {
     const category = await prismaClient.category.findUnique({
       where: {
         id,
@@ -49,7 +48,7 @@ export class CategoryService {
     return category
   }
 
-  async listCategories() {
+  async listCategories(userId: string) {
     return prismaClient.category.findMany({
       where: {
         userId: userId
@@ -57,7 +56,7 @@ export class CategoryService {
     })
   }
 
-  async deleteCategory(id: string) {
+  async deleteCategory(id: string, userId: string) {
     const category = await prismaClient.category.findUnique({
       where: {
         id,
