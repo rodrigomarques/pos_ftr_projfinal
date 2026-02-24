@@ -3,6 +3,7 @@ import { Navigate, Route, Routes} from 'react-router-dom'
 import { Login } from './pages/Auth/Login'
 import { useAuthStore } from './stores/auth'
 import { Signup } from './pages/Auth/Signup'
+import { Dashboard } from './pages/Dashboard/Index'
 
 /*
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -31,6 +32,12 @@ function App() {
               <Signup />
             </PublicRoute>
           } />
+          <Route
+            path="/"
+            element={
+              <Dashboard />
+            }
+          />
         </Routes>
       </Layout>
     </>
