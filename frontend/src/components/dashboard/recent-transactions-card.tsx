@@ -33,7 +33,7 @@ export function RecentTransactionsCard({
   items: RecentTx[]
 }) {
   return (
-    <Card className="border bg-white rounded-xl">
+    <Card className="border bg-white rounded-xl border-none">
       <CardHeader className="flex flex-row items-center justify-between px-6 py-5">
         <span className="text-xs font-semibold tracking-wide text-muted-foreground">
           TRANSAÇÕES RECENTES
@@ -50,7 +50,7 @@ export function RecentTransactionsCard({
       <CardContent className="px-0 pb-0">
         <div className="divide-y">
           {items.map((tx) => (
-            <div key={tx.id} className="grid grid-cols-[56px_1fr_auto_auto_auto] items-center gap-4 px-6 py-5">
+            <div key={tx.id} className="grid grid-cols-[56px_1fr_auto_auto_auto] items-center gap-4 px-6 py-5 border-b border-gray-200">
               {/* Icon */}
               <div
                 className="flex h-10 w-10 items-center justify-center rounded-lg"
@@ -92,10 +92,10 @@ export function RecentTransactionsCard({
         </div>
 
         {/* Footer */}
-        <div className="border-t px-6 py-5">
+        <div className="border-t px-6 py-5 border-gray-200">
           <Link
             to="/transactions/new"
-            className="mx-auto flex w-fit items-center gap-2 text-sm font-medium text-emerald-700 hover:underline"
+            className="mx-auto flex w-fit items-center gap-2 text-sm font-medium text-emerald-700 hover:underline "
           >
             <Plus className="h-4 w-4" />
             Nova transação

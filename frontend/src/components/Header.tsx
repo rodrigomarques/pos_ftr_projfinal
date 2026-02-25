@@ -9,7 +9,6 @@ export function Header() {
   const navigate = useNavigate()
 
   const path = window.location.pathname
-  console.log(path)
 
   const user2 = {
     name: "John Doe",
@@ -31,7 +30,7 @@ export function Header() {
             <Link to="/">
               <Button
                 size="sm"
-                className="gap-2 cursor-pointer"
+                className="gap-2 cursor-pointer transition-colors hover:bg-emerald-50 hover:text-emerald-700"
                 variant={ path === "/" ? "primary" : "default" }
               >
                 Dashboard
@@ -40,7 +39,7 @@ export function Header() {
             <Link to="/transactions">
               <Button
                 size="sm"
-                className="gap-2 cursor-pointer"
+                className="gap-2 cursor-pointer transition-colors hover:bg-emerald-50 hover:text-emerald-700"
                 variant={ path === "/transactions" ? "primary" : "default" }
               >
                 Transações
@@ -49,7 +48,7 @@ export function Header() {
             <Link to="/categories">
               <Button
                 size="sm"
-                className="gap-2 cursor-pointer"
+                className="gap-2 cursor-pointer transition-colors hover:bg-emerald-50 hover:text-emerald-700"
                 variant={ path === "/categories" ? "primary" : "default" }
               >
                 Categorias
@@ -58,11 +57,13 @@ export function Header() {
           </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-2">
-              <Avatar className="w-10 h-10">
-                <AvatarFallback className="bg-gray-400 text-xl text-black ">
-                  {user2?.name?.slice(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <Link to="/my-account">
+                <Avatar className="w-10 h-10">
+                  <AvatarFallback className="bg-gray-400 text-xl text-black ">
+                    {user2?.name?.slice(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
               
             </div>            
           </div>

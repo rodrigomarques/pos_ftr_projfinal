@@ -26,20 +26,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Page } from "@/components/Page"
+import { Badge } from "@/components/Badge"
 
-function Badge({ label, color }: { label: string; color: string }) {
-  return (
-    <span
-      className="inline-flex h-7 w-fit items-center justify-center whitespace-nowrap rounded-full px-3 text-xs font-medium"
-      style={{
-        backgroundColor: `${color}20`,
-        color,
-      }}
-    >
-      {label}
-    </span>
-  )
-}
 
 type Row = {
   id: string
@@ -164,7 +152,7 @@ export function Transaction() {
         </div>
 
         {/* FILTERS */}
-        <Card className="bg-white">
+        <Card className="bg-white border-none">
           <CardContent className="p-5 grid gap-4 md:grid-cols-4">
             {/* Buscar */}
             <div className="space-y-2">
@@ -174,6 +162,7 @@ export function Transaction() {
                 <Input
                   placeholder="Buscar por descrição"
                   className="pl-10 h-11 focus:ring-0
+                    border-gray-200
                     focus-visible:ring-0
                     focus-visible:ring-offset-0"
                 />
@@ -198,6 +187,7 @@ export function Transaction() {
                     focus:ring-0
                     focus-visible:ring-0
                     focus-visible:ring-offset-0
+                    border-gray-200
                   "
                 >
                   <SelectValue placeholder="Todos" />
@@ -208,7 +198,7 @@ export function Transaction() {
                   side="bottom"
                   align="start"
                   sideOffset={4}
-                  className="min-w-[--radix-select-trigger-width] rounded-md border bg-white p-1 shadow-md"
+                  className="min-w-[--radix-select-trigger-width] rounded-md border bg-white p-1 shadow-md border-gray-200"
                 >
                   <SelectItem value="all">Todos</SelectItem>
                   <SelectItem value="income">Entrada</SelectItem>
@@ -235,6 +225,7 @@ export function Transaction() {
                     focus:ring-0
                     focus-visible:ring-0
                     focus-visible:ring-offset-0
+                    border-gray-200
                   "
                 >
                   <SelectValue placeholder="Todas" />
@@ -244,7 +235,7 @@ export function Transaction() {
                   side="bottom"
                   align="start"
                   sideOffset={4}
-                  className="min-w-[--radix-select-trigger-width] rounded-md border bg-white p-1 shadow-md">
+                  className="min-w-[--radix-select-trigger-width] rounded-md border bg-white p-1 shadow-md border-gray-200">
                   <SelectItem value="all">Todas</SelectItem>
                 </SelectContent>
               </Select>
@@ -267,6 +258,7 @@ export function Transaction() {
                     focus:ring-0
                     focus-visible:ring-0
                     focus-visible:ring-offset-0
+                    border-gray-200
                   "
                 >
                   <SelectValue placeholder="Novembro / 2025" />
@@ -276,7 +268,7 @@ export function Transaction() {
                   side="bottom"
                   align="start"
                   sideOffset={4}
-                  className="min-w-[--radix-select-trigger-width] rounded-md border bg-white p-1 shadow-md">
+                  className="min-w-[--radix-select-trigger-width] rounded-md border bg-white p-1 shadow-md border-gray-200">
                   <SelectItem value="nov">Novembro / 2025</SelectItem>
                 </SelectContent>
               </Select>
@@ -285,10 +277,10 @@ export function Transaction() {
         </Card>
 
         {/* TABLE */}
-        <Card className="bg-white">
+        <Card className="bg-white border-none">
           <CardContent className="p-0">
             {/* Header */}
-            <div className="grid grid-cols-[1fr_120px_160px_120px_140px_100px] px-6 py-4 text-xs font-semibold text-muted-foreground border-b">
+            <div className="grid grid-cols-[1fr_120px_160px_120px_140px_100px] px-6 py-4 text-xs font-semibold text-muted-foreground border-b  border-gray-200">
               <span>DESCRIÇÃO</span>
               <span>DATA</span>
               <span>CATEGORIA</span>
@@ -302,7 +294,7 @@ export function Transaction() {
               {rows.map((row) => (
                 <div
                   key={row.id}
-                  className="grid grid-cols-[1fr_120px_160px_120px_140px_100px] items-center px-6 py-4"
+                  className="grid grid-cols-[1fr_120px_160px_120px_140px_100px] items-center px-6 py-4 border-b border-gray-200"
                 >
                   {/* Descrição */}
                   <div className="flex items-center gap-3">

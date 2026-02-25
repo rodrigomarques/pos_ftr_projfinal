@@ -23,7 +23,7 @@ function Pill({ label, color }: { label: string; color: string }) {
 
 export function CategoriesCard({ rows }: { rows: CategoryRow[] }) {
   return (
-    <Card className="border bg-white rounded-xl">
+    <Card className="border bg-white rounded-xl border-none">
       <CardHeader className="flex flex-row items-center justify-between px-6 py-5">
         <span className="text-xs font-semibold tracking-wide text-muted-foreground">
           CATEGORIAS
