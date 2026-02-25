@@ -8,6 +8,9 @@ export function Header() {
   const { user, logout, isAuthenticated } = useAuthStore()
   const navigate = useNavigate()
 
+  const path = window.location.pathname
+  console.log(path)
+
   const user2 = {
     name: "John Doe",
     email: "johndue@gmail.com"
@@ -28,26 +31,26 @@ export function Header() {
             <Link to="/">
               <Button
                 size="sm"
-                className="gap-2"
-                variant={"primary"}
+                className="gap-2 cursor-pointer"
+                variant={ path === "/" ? "primary" : "default" }
               >
                 Dashboard
               </Button>
             </Link>
-            <Link to="/">
+            <Link to="/transactions">
               <Button
                 size="sm"
-                className="gap-2"
-                variant={"default"}
+                className="gap-2 cursor-pointer"
+                variant={ path === "/transactions" ? "primary" : "default" }
               >
                 Transações
               </Button>
             </Link>
-            <Link to="/">
+            <Link to="/categories">
               <Button
                 size="sm"
-                className="gap-2"
-                variant={"default"}
+                className="gap-2 cursor-pointer"
+                variant={ path === "/categories" ? "primary" : "default" }
               >
                 Categorias
               </Button>
