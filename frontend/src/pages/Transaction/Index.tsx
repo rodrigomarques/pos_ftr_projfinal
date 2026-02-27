@@ -27,6 +27,8 @@ import {
 } from "@/components/ui/select"
 import { Page } from "@/components/Page"
 import { Badge } from "@/components/Badge"
+import { useState } from "react"
+import { NewTransactionModal } from "@/components/newTransactionModal"
 
 
 type Row = {
@@ -133,8 +135,11 @@ export function Transaction() {
     },
   ]
 
+  const [open, setOpen] = useState(false)
+
   return (
     <Page>
+      <NewTransactionModal open={open} onOpenChange={setOpen} />
       <div className="space-y-6 p-6 bg-muted/40 min-h-screen">
         {/* HEADER */}
         <div className="flex items-start justify-between">
@@ -145,7 +150,10 @@ export function Transaction() {
             </p>
           </div>
 
-          <Button className="bg-emerald-700 hover:bg-emerald-800 text-white">
+          <Button
+            className="bg-emerald-700 hover:bg-emerald-800 text-white"
+            onClick={() => setOpen(true)}
+          >
             <Plus className="h-4 w-4 mr-2" />
             Nova transação
           </Button>
