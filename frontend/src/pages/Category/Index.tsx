@@ -16,6 +16,8 @@ import { Button } from "@/components/ui/button"
 import { StatCard } from "@/components/dashboard/stat-card"
 import { Page } from "@/components/Page"
 import { CategoryCard } from "@/components/CategoryCard"
+import { useState } from "react"
+import { NewCategoryModal } from "@/components/NewCategoryModal"
 
 export type Category = {
   id: string
@@ -111,9 +113,11 @@ export default function Category() {
       iconColor: "#ca8a04",
     },
   ]
-
+  const [open, setOpen] = useState(false)  
+  
   return (
     <Page>
+      <NewCategoryModal open={open} onOpenChange={setOpen} />
     <div className="space-y-6 p-6 bg-muted/40 min-h-screen">
       {/* HEADER */}
       <div className="flex items-start justify-between">
@@ -124,7 +128,7 @@ export default function Category() {
           </p>
         </div>
 
-        <Button className="bg-emerald-700 hover:bg-emerald-800 text-white">
+        <Button className="bg-emerald-700 hover:bg-emerald-800 text-white"  onClick={() => setOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Nova categoria
         </Button>
