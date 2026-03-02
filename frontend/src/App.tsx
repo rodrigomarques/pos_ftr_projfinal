@@ -7,12 +7,11 @@ import { Dashboard } from './pages/Dashboard/Index'
 import { Transaction } from './pages/Transaction/Index'
 import Category from './pages/Category/Index'
 import { MyAccount } from './pages/MyAccount/Index'
-/*
+
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore()
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />
 }
-*/
 
 function PublicRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore()
@@ -37,25 +36,33 @@ function App() {
           <Route
             path="/"
             element={
-              <Dashboard />
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/transactions"
             element={
-              <Transaction />
+              <ProtectedRoute>
+                <Transaction />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/categories"
             element={
-              <Category />
+              <ProtectedRoute>
+                <Category />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/my-account"
             element={
-              <MyAccount />
+              <ProtectedRoute>
+                <MyAccount />
+              </ProtectedRoute>
             }
           />
         </Routes>

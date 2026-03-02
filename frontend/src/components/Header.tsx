@@ -21,7 +21,7 @@ export function Header() {
 
   return (
     <div className="w-full ">
-      {(isAuthenticated || true) && (
+      {(isAuthenticated) && (
         <div className="flex justify-between p-5 bg-white w-full">
           <div className="min-w-48">
             <img src={logoIcon} />
