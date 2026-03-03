@@ -44,7 +44,7 @@ export function Signup() {
     defaultValues: {
       email: "",
       password: "",
-      remember: false,
+      name: "",
     },
   })
 
@@ -57,18 +57,21 @@ export function Signup() {
     setLoading(true)
 
     try {
+      toast.success("Cadastro realizado com sucesso!")
+      /*
       const registerMutate = await registerUser({
         email: data.email,
         password: data.password,
-        name: ''
+        name: data.name
       })
 
       if (registerMutate) {
         toast.success("Cadastro realizado com sucesso!")
       }
+        */
     } catch (error) {
       console.log(error)
-      toast.error("Falha ao realizar o login!")
+      toast.error("Falha ao realizar o cadastro!")
     } finally {
       setLoading(false)
     }

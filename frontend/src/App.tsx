@@ -7,6 +7,7 @@ import { Dashboard } from './pages/Dashboard/Index'
 import { Transaction } from './pages/Transaction/Index'
 import Category from './pages/Category/Index'
 import { MyAccount } from './pages/MyAccount/Index'
+import { Toaster } from "sonner"
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore()
@@ -21,6 +22,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <>
+      <Toaster richColors position="top-right" />
       <Layout>
         <Routes>
           <Route path="/login" element={
