@@ -57,8 +57,6 @@ export function Signup() {
     setLoading(true)
 
     try {
-      toast.success("Cadastro realizado com sucesso!")
-      /*
       const registerMutate = await registerUser({
         email: data.email,
         password: data.password,
@@ -68,7 +66,6 @@ export function Signup() {
       if (registerMutate) {
         toast.success("Cadastro realizado com sucesso!")
       }
-        */
     } catch (error) {
       console.log(error)
       toast.error("Falha ao realizar o cadastro!")

@@ -46,6 +46,10 @@ export function Login() {
       password: "",
       remember: false,
     },
+    values: {
+      email: "",
+      password: "",
+    },
   })
 
   const [loading, setLoading] = useState(false)

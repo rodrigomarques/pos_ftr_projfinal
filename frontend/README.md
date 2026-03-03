@@ -1,7 +1,7 @@
 # Projeto POSGRADUAÇÃO FTR
 
 ## Tarefas
-- [ ]  O usuário pode criar uma conta e fazer login
+- [x]  O usuário pode criar uma conta e fazer login
 - [ ]  O usuário pode ver e gerenciar apenas as transações e categorias criadas por ele
 - [ ]  Deve ser possível criar uma transação
 - [ ]  Deve ser possível deletar uma transação
@@ -14,8 +14,8 @@
 
 Além disso, também temos algumas regras importantes específicas para o front-end:
 
-- [ ]  É obrigatória a criação de uma aplicação React usando GraphQL para consultas na API e Vite como `bundler`;
-- [ ]  Siga o mais fielmente possível o layout do Figma;
+- [x]  É obrigatória a criação de uma aplicação React usando GraphQL para consultas na API e Vite como `bundler`;
+- [x]  Siga o mais fielmente possível o layout do Figma;
 
 ## Run
 Copy .env.example to .env

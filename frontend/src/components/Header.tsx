@@ -1,23 +1,14 @@
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { useAuthStore } from "../stores/auth"
 import logoIcon from "@/assets/logo-icon.svg"
 import { Button } from "./ui/button"
+import { useLocation } from "react-router-dom"
 import { Avatar, AvatarFallback } from "./ui/avatar"
 
 export function Header() {
-  const { user, logout, isAuthenticated } = useAuthStore()
-  const navigate = useNavigate()
-
-  const path = window.location.pathname
-
-  const user2 = {
-    name: "John Doe",
-    email: "johndue@gmail.com"
-  }
-  const handleLogout = () => {
-    logout()
-    navigate("/login")
-  }
+  const { user,isAuthenticated } = useAuthStore()
+  const location = useLocation()
+  const path = location.pathname
 
   return (
     <div className="w-full ">
@@ -60,7 +51,7 @@ export function Header() {
               <Link to="/my-account">
                 <Avatar className="w-10 h-10">
                   <AvatarFallback className="bg-gray-400 text-xl text-black ">
-                    {user2?.name?.slice(0, 2).toUpperCase()}
+                    {user?.name?.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </Link>

@@ -9,18 +9,79 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { LogOut, Mail, User } from "lucide-react"
 import { Page } from "@/components/Page"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { useAuthStore } from "@/stores/auth"
 
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { toast } from "sonner"
+
+const userSchema = z.object({
+  id: z.string().optional(),
+  email: z
+    .string()
+    .min(1, "E-mail é obrigatório")
+    .email("Informe um e-mail válido"),
+  name: z
+    .string()
+    .min(1, "Nome é obrigatório")
+    .min(6, "Nome deve ter pelo menos 6 caracteres"),
+})
+
+type UserFormData = z.infer<typeof userSchema>
 
 export function MyAccount() {
 
-  const [showPassword, setShowPassword] = useState(false)
-  const user2 = {
-    name: "John Doe",
-    email: "johndue@gmail.com"
+  const { user, logout } = useAuthStore()
+  const navigate = useNavigate()
+  
+  const handleLogout = () => {
+    logout()
+    navigate("/login")
+  }
+
+  const {
+      register,
+      handleSubmit,
+      formState: { errors },
+    } = useForm<UserFormData>({
+      resolver: zodResolver(userSchema),
+      defaultValues: {
+        email: user?.email || "",
+        name: user?.name || "",
+      },
+      values: {
+        email: user?.email || "",
+        name: user?.name || "",
+      },
+    })
+
+  const [loading, setLoading] = useState(false)
+
+  const update = useAuthStore((state) => state.update)
+  const onSubmit = async (values: UserFormData) => {
+    setLoading(true)
+
+    try {
+     const updateMutate = await update({
+        id: user?.id || "",
+        email: values.email,
+        name: values.name,
+      })
+
+      if (updateMutate) {
+        toast.success("Usuário atualizado com sucesso!")
+      }
+    } catch (error) {
+      console.log(error)
+      toast.error("Falha ao atualizar o usuário!")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -33,16 +94,16 @@ export function MyAccount() {
               <CardTitle className="text-xl font-semibold text-center flex items-center gap-2 justify-center">
                 <Avatar className="w-10 h-10">
                   <AvatarFallback className="bg-gray-400 text-xl text-black ">
-                    {user2?.name?.slice(0, 2).toUpperCase()}
+                    {user?.name?.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </CardTitle>
               <CardDescription>
                 <p className="font-medium">
-                  {user2?.name}
+                  {user?.name}
                 </p>
                 <p className="text-sm text-gray-500">
-                  {user2?.email}
+                  {user?.email}
                 </p>
               </CardDescription>
             </CardHeader>
@@ -52,17 +113,18 @@ export function MyAccount() {
                 <div className="h-px flex-1 bg-gray-300" />
               </div>
 
-              <form className="space-y-6">
+              <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} >
                 <div className="space-y-2">
-                  <label htmlFor="nome" className="text-sm font-medium">
+                  <label htmlFor="name" className="text-sm font-medium">
                     Nome completo
                   </label>
 
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground text-gray-500" />
                     <Input
-                      id="nome"
+                      id="name"
                       type="text"
+                      {...register("name")}
                       placeholder="Nome completo"
                       className="pl-10 h-12 border-gray-300"
                       required
@@ -84,6 +146,7 @@ export function MyAccount() {
                       placeholder="mail@exemplo.com"
                       className="pl-10 h-12 border-gray-300"
                       required
+                      {...register("email")}
                     />
                   </div>
                   <p className="text-xs text-gray-400">
@@ -95,14 +158,14 @@ export function MyAccount() {
                   type="submit"
                   className="w-full h-12 bg-emerald-700 text-white hover:bg-emerald-800"
                 >
-                  Salvar alterações
+                  { loading ? "Salvando..." : "Salvar alterações" }
                 </Button>
 
                 <Button variant="outline" className="w-full h-12" asChild>
-                  <Link to="/signup" className="flex items-center justify-center gap-2">
+                  <Button className="flex items-center justify-center gap-2" onClick={handleLogout}>
                     <LogOut className="h-4 w-4 text-red-500" />
                     Sair da conta
-                  </Link>
+                  </Button>
                 </Button>
               </form>
             </CardContent>
