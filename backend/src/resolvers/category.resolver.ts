@@ -20,7 +20,6 @@ export class CategoryResolver {
 
   @Query(() => [CategoryModel])
   async listCategories(@Ctx() ctx: GraphqlContext,): Promise<CategoryModel[]> {
-    console.log(ctx.user)
     return await this.categoryService.listCategories(ctx.user)
   }
 

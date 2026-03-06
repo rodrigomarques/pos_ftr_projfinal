@@ -24,3 +24,10 @@ export interface UpdateUserInput {
   email: string,
   name: string
 }
+
+export interface CreateCategoryInput {
+  name: string
+  color: string
+  type: string
+  icon?: string
+}

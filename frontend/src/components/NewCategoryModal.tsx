@@ -31,6 +31,9 @@ import {
   CreditCard,
   Receipt,
 } from "lucide-react"
+import { useMutation } from "@apollo/client/react"
+import { CREATE_CATEGORY } from "@/lib/graphql/mutations/categories/Save"
+import { toast } from "sonner"
 
 // ================= SCHEMA =================
 const schema = z.object({
@@ -92,9 +95,30 @@ export function NewCategoryModal({ open, onOpenChange }: Props) {
     resolver: zodResolver(schema),
   })
 
-  const onSubmit = (data: FormData) => {
-    console.log(data)
-    onOpenChange(false)
+  const [createCategoryMutation, { loading }] = useMutation(CREATE_CATEGORY, {
+    onCompleted: () => {
+      onOpenChange(false)
+      setValue("title", "")
+      setValue("description", "")
+      setValue("icon", "")
+      setValue("color", "")
+      setSelectedIcon("")
+      setSelectedColor("")
+
+      toast.success("Categoria criada com sucesso!")
+    },
+  })
+  const onSubmit = async (data: FormData) => {
+    await createCategoryMutation({
+      variables: {
+        data: {
+          name: data.title,
+          color: data.color,
+          type: "EXPENSE",
+          icon: data.icon
+        },
+      },
+    })
   }
 
   return (
@@ -211,6 +235,7 @@ export function NewCategoryModal({ open, onOpenChange }: Props) {
           <Button
             type="submit"
             className="w-full h-11 bg-emerald-700 hover:bg-emerald-800 text-white rounded-lg"
+            disabled={loading}
           >
             Salvar
           </Button>

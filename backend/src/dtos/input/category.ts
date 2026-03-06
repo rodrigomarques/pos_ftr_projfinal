@@ -11,6 +11,9 @@ export class CreateCategoryInput {
 
   @Field(() => TransactionType, { nullable: false })
   type!: TransactionType
+
+  @Field(() => String, { nullable: true })
+  icon?: string
 }
 
 @InputType()
@@ -26,4 +29,7 @@ export class UpdateCategoryInput {
 
   @Field(() => TransactionType, { nullable: false })
   type!: TransactionType
+
+  @Field(() => String, { nullable: true })
+  icon?: string
 }

@@ -13,6 +13,9 @@ export class CategoryModel {
   @Field(() => String)
   color!: string
 
+  @Field(() => String,  { nullable: true })
+  icon?: string
+
   @Field(() => String, { nullable: false })
   type!: string
 

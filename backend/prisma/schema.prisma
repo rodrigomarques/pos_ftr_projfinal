@@ -35,6 +35,7 @@ model Category {
   id        String       @id @default(uuid())
   name      String
   color     String?
+  icon      String?
   type      TransactionType?
 
   userId    String
