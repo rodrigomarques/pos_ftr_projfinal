@@ -49,7 +49,7 @@ export function CategoryCard({ category, onDelete, setCategory }: { category: Ca
         <div className="flex items-center justify-between">
           <Badge label={category.name} color={category.color} />
           <span className="text-xs text-muted-foreground">
-            {category.items} {category.items === 1 ? "item" : "itens"}
+            {category.totalTransactions} {category.totalTransactions === 1 ? "item" : "itens"}
           </span>
         </div>
       </CardContent>

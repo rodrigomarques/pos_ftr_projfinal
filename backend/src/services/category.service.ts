@@ -1,3 +1,4 @@
+import { CategoryModel } from '@generated/prisma/internal/prismaNamespaceBrowser'
 import { prismaClient } from '../../prisma/prisma'
 import { CreateCategoryInput, UpdateCategoryInput } from '@/dtos/input/category'
 
@@ -49,10 +50,43 @@ export class CategoryService {
     return category
   }
 
-  async listCategories(userId: string) {
-    return prismaClient.category.findMany({
-      where: {
-        userId: userId
+  async listCategories(userId: string, withStats = false): Promise<CategoryModel[]> {
+    const categories = await prismaClient.category.findMany({
+      where: { userId },
+      ...(withStats && {
+        include: {
+          _count: {
+            select: { transactions: true }
+          },
+          transactions: {
+            select: {
+              amount: true,
+              type: true
+            }
+          }
+        }
+      })
+    })
+
+    return categories.map((category: any) => {
+      let totalTransactions: number | undefined
+      let sumTransactions: number | undefined
+
+      if (withStats) {
+        totalTransactions = category._count.transactions
+
+        sumTransactions = category.transactions.reduce((acc: number, t: any) => {
+          const value = Number(t.amount)
+          return t.type === "INCOME" ? acc + value : acc - value
+        }, 0)
+      }   
+
+      const { transactions, _count, ...rest } = category
+
+      return {
+        ...rest,
+        totalTransactions,
+        sumTransactions
       }
     })
   }

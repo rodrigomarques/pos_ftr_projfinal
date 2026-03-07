@@ -25,6 +25,8 @@ export type Category = {
   color: string
   items: number
   icon: string
+  totalTransactions: number
+  sumTransactions: number
 }
 
 export default function Category() {
@@ -35,6 +37,27 @@ export default function Category() {
 
   const [totalTransacoes, setTotalTransacoes] = useState(0)
   const [categoryMostUsed, setCategoryMostUsed] = useState<Category|null>(null)
+  
+  useEffect(() => {
+    if (!listCategories.length) return
+
+    const total = listCategories.reduce(
+      (acc, category) => acc + (category.totalTransactions ?? 0),
+      0
+    )
+
+    const mostUsed = listCategories.reduce<Category | null>((prev, current) => {
+      if (!prev) return current
+
+      return (current.totalTransactions ?? 0) > (prev.totalTransactions ?? 0)
+        ? current
+        : prev
+    }, null)
+
+    setTotalTransacoes(total)
+    setCategoryMostUsed(mostUsed)
+  }, [listCategories])
+
   const [category, setCategory] = useState<Category|null>(null)
 
   const [deleteCategoryMutation, { loading: deleting }] = useMutation(DELETE_CATEGORY, {

@@ -27,6 +27,12 @@ export class CategoryModel {
 
   @Field(() => [TransactionModel], { nullable: true })
   transactions?: TransactionModel[]
+  
+  @Field(() => Number, { nullable: true })
+  totalTransactions?: number
+
+  @Field(() => Number, { nullable: true })
+  sumTransactions?: number
 
   @Field(() => GraphQLISODateTime)
   createdAt!: Date

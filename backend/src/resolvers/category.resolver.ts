@@ -19,8 +19,11 @@ export class CategoryResolver {
   }
 
   @Query(() => [CategoryModel])
-  async listCategories(@Ctx() ctx: GraphqlContext,): Promise<CategoryModel[]> {
-    return await this.categoryService.listCategories(ctx.user)
+  async listCategories(
+    @Ctx() ctx: GraphqlContext,
+    @Arg("withStats", () => Boolean, { defaultValue: false }) withStats: boolean
+  ): Promise<CategoryModel[]> {
+    return this.categoryService.listCategories(ctx.user, withStats)
   }
 
   @Mutation(() => Boolean)
