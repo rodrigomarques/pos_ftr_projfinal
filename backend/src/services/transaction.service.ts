@@ -1,5 +1,7 @@
-import { CreateTransactionInput, UpdateTransactionInput } from '@/dtos/input/transaction'
+import { CreateTransactionInput, TransactionFilterInput, UpdateTransactionInput } from '@/dtos/input/transaction'
 import { prismaClient } from '../../prisma/prisma'
+import { Prisma } from "@generated/prisma/client"
+
 export class TransactionService {
 
   async createTransaction(data: CreateTransactionInput, userId: string) {
@@ -15,13 +17,50 @@ export class TransactionService {
     })
   }
 
-  async listTransactions(userId: string) {
-    return await prismaClient.transaction.findMany({
+  async listTransactions(userId: string, filters?: TransactionFilterInput) {
+
+    let startDate: Date | undefined
+    let endDate: Date | undefined
+
+    if (filters?.period) {
+      const [month, year] = filters.period.split("/").map(Number)
+
+      startDate = new Date(year, month - 1, 1)
+      endDate = new Date(year, month, 0, 23, 59, 59)
+    }
+
+    return prismaClient.transaction.findMany({
       where: {
-        userId: userId
+        userId,
+
+        ...(filters?.description && {
+          title: {
+            contains: filters.description,
+          }
+        }),
+
+        ...(filters?.type && {
+          type: filters.type
+        }),
+
+        ...(filters?.categoryId && {
+          categoryId: filters.categoryId
+        }),
+
+        ...(startDate && {
+          date: {
+            gte: startDate,
+            lte: endDate
+          }
+        })
       },
-      include: { 
-        category: true 
+
+      include: {
+        category: true
+      },
+
+      orderBy: {
+        date: "desc"
       }
     })
   }

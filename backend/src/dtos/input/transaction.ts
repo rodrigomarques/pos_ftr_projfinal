@@ -42,3 +42,19 @@ export class UpdateTransactionInput {
   @Field(() => TransactionType, { nullable: true })
   type?: TransactionType
 }
+
+@InputType()
+export class TransactionFilterInput {
+
+  @Field(() => String, { nullable: true })
+  description?: string
+
+  @Field(() => TransactionType, { nullable: true })
+  type?: TransactionType
+
+  @Field(() => String, { nullable: true })
+  categoryId?: string
+
+  @Field(() => String, { nullable: true })
+  period?: string
+}

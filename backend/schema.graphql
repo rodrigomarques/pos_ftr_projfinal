@@ -73,8 +73,15 @@ type Mutation {
 type Query {
   getUser(id: String!): UserOutput!
   listCategories(withStats: Boolean! = false): [CategoryModel!]!
-  listTransactions: [TransactionModel!]!
+  listTransactions(filters: TransactionFilterInput): [TransactionModel!]!
   listUsers: [UserOutput!]!
+}
+
+input TransactionFilterInput {
+  categoryId: String
+  description: String
+  period: String
+  type: TransactionType
 }
 
 type TransactionModel {

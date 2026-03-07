@@ -1,6 +1,6 @@
 import { Arg, Ctx, Mutation, Query, Resolver, UseMiddleware } from 'type-graphql'
 import { TransactionModel } from '@/models/transaction.model'
-import { CreateTransactionInput, UpdateTransactionInput } from '@/dtos/input/transaction'
+import { CreateTransactionInput, TransactionFilterInput, UpdateTransactionInput } from '@/dtos/input/transaction'
 import { TransactionService } from '@/services/transaction.service'
 import { GraphqlContext } from '@/graphql/context'
 import { IsAuth } from '@/middlewares/auth.middleware'
@@ -19,8 +19,13 @@ export class TransactionResolver {
   }
 
   @Query(() => [TransactionModel])
-  async listTransactions(@Ctx() ctx: GraphqlContext): Promise<TransactionModel[]> {
-    return await this.transactionService.listTransactions(ctx.user)
+  async listTransactions(
+    @Ctx() ctx: GraphqlContext,
+    @Arg("filters", () => TransactionFilterInput, { nullable: true })
+    filters?: TransactionFilterInput
+  ): Promise<TransactionModel[]> {
+
+    return this.transactionService.listTransactions(ctx.user, filters)
   }
 
   @Mutation(() => Boolean)
