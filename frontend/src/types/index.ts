@@ -67,11 +67,13 @@ export type Category = {
   icon: string
 }
 
+export type TransactionType = "EXPENSE" | "INCOME"
+
 export interface CreateTransactionInput {
   title: string
   amount: number
   date: string
-  type: "expense" | "income"
+  type: TransactionType
   categoryId: string
 }
 
@@ -80,7 +82,7 @@ export interface UpdateTransactionInput {
   title: string
   amount: number
   date: string
-  type: "expense" | "income"
+  type: TransactionType
   categoryId: string
 }
 
@@ -88,7 +90,7 @@ export type Transaction = {
   id: string
   title: string
   amount: number
-  type: "expense" | "income"
+  type: TransactionType
   date: string
   categoryId: string
   category: Category

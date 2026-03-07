@@ -25,8 +25,6 @@ export type Category = {
   color: string
   items: number
   icon: string
-  iconBg: string
-  iconColor: string
 }
 
 export default function Category() {

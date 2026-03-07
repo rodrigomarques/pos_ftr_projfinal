@@ -7,12 +7,6 @@ import {
   Pencil,
   ArrowDownCircle,
   ArrowUpCircle,
-  Utensils,
-  Car,
-  ShoppingCart,
-  PiggyBank,
-  Wallet,
-  Ticket,
 } from "lucide-react"
 
 import { Card, CardContent } from "@/components/ui/card"
@@ -28,118 +22,49 @@ import {
 import { Page } from "@/components/Page"
 import { Badge } from "@/components/Badge"
 import { useState } from "react"
-import { NewTransactionModal } from "@/components/newTransactionModal"
+import { NewTransactionModal } from "@/components/NewTransactionModal"
+import type { Category } from "../Category/Index"
+import { useMutation, useQuery } from "@apollo/client/react"
+import { LIST_TRANSACTIONS } from "@/lib/graphql/queries/Transactions"
+import { ICONS, type TransactionType } from "@/types"
+import { GlobalLoading } from "@/components/GlobalLoading"
+import { DELETE_TRANSACTION } from "@/lib/graphql/mutations/transactions/Index"
+import { toast } from "sonner"
 
 
-type Row = {
+export type Transaction = {
   id: string
   title: string
   date: string
-  category: { name: string; color: string }
-  type: "income" | "expense"
-  value: string
+  category: Category
+  type: TransactionType
+  amount: number
   icon: React.ReactElement
   iconBg: string
   iconColor: string
 }
 
 export function Transaction() {
-  const rows: Row[] = [
-    {
-      id: "1",
-      title: "Jantar no Restaurante",
-      date: "30/11/25",
-      category: { name: "Alimentação", color: "#2563eb" },
-      type: "expense",
-      value: "R$ 89,50",
-      icon: <Utensils className="h-5 w-5" />,
-      iconBg: "#dbeafe",
-      iconColor: "#2563eb",
+
+  const { data, loading } = useQuery<{ listTransactions: Transaction[] }>(LIST_TRANSACTIONS)
+  const listTransactions = data?.listTransactions || []
+
+  const [deleteTransactionMutation, { loading: deleting }] = useMutation(DELETE_TRANSACTION, {
+    onCompleted: () => {
+      toast.success("Transação deletada com sucesso!")
     },
-    {
-      id: "2",
-      title: "Posto de Gasolina",
-      date: "29/11/25",
-      category: { name: "Transporte", color: "#7c3aed" },
-      type: "expense",
-      value: "R$ 100,00",
-      icon: <Car className="h-5 w-5" />,
-      iconBg: "#ede9fe",
-      iconColor: "#7c3aed",
-    },
-    {
-      id: "3",
-      title: "Compras no Mercado",
-      date: "28/11/25",
-      category: { name: "Mercado", color: "#ea580c" },
-      type: "expense",
-      value: "R$ 156,80",
-      icon: <ShoppingCart className="h-5 w-5" />,
-      iconBg: "#ffedd5",
-      iconColor: "#ea580c",
-    },
-    {
-      id: "4",
-      title: "Retorno de Investimento",
-      date: "26/11/25",
-      category: { name: "Investimento", color: "#16a34a" },
-      type: "income",
-      value: "R$ 340,25",
-      icon: <PiggyBank className="h-5 w-5" />,
-      iconBg: "#dcfce7",
-      iconColor: "#16a34a",
-    },
-    {
-      id: "5",
-      title: "Aluguel",
-      date: "26/11/25",
-      category: { name: "Utilidades", color: "#ca8a04" },
-      type: "expense",
-      value: "R$ 1.700,00",
-      icon: <Wallet className="h-5 w-5" />,
-      iconBg: "#fef3c7",
-      iconColor: "#ca8a04",
-    },
-    {
-      id: "6",
-      title: "Freelance",
-      date: "24/11/25",
-      category: { name: "Salário", color: "#16a34a" },
-      type: "income",
-      value: "R$ 2.500,00",
-      icon: <Wallet className="h-5 w-5" />,
-      iconBg: "#dcfce7",
-      iconColor: "#16a34a",
-    },
-    {
-      id: "7",
-      title: "Compras Jantar",
-      date: "22/11/25",
-      category: { name: "Mercado", color: "#ea580c" },
-      type: "expense",
-      value: "R$ 150,00",
-      icon: <ShoppingCart className="h-5 w-5" />,
-      iconBg: "#ffedd5",
-      iconColor: "#ea580c",
-    },
-    {
-      id: "8",
-      title: "Cinema",
-      date: "18/11/25",
-      category: { name: "Entretenimento", color: "#db2777" },
-      type: "expense",
-      value: "R$ 88,00",
-      icon: <Ticket className="h-5 w-5" />,
-      iconBg: "#fce7f3",
-      iconColor: "#db2777",
-    },
-  ]
+    refetchQueries: [LIST_TRANSACTIONS],
+  })
 
   const [open, setOpen] = useState(false)
+  const handleOpenChange = (value: boolean) => {
+    setOpen(value)
+  }
 
   return (
     <Page>
-      <NewTransactionModal open={open} onOpenChange={setOpen} />
+      <GlobalLoading open={loading || deleting} /> 
+      <NewTransactionModal open={open} onOpenChange={handleOpenChange}  />
       <div className="space-y-6 p-6 bg-muted/40 min-h-screen">
         {/* HEADER */}
         <div className="flex items-start justify-between">
@@ -284,10 +209,8 @@ export function Transaction() {
           </CardContent>
         </Card>
 
-        {/* TABLE */}
         <Card className="bg-white border-none">
           <CardContent className="p-0">
-            {/* Header */}
             <div className="grid grid-cols-[1fr_120px_160px_120px_140px_100px] px-6 py-4 text-xs font-semibold text-muted-foreground border-b  border-gray-200">
               <span>DESCRIÇÃO</span>
               <span>DATA</span>
@@ -299,21 +222,25 @@ export function Transaction() {
 
             {/* Rows */}
             <div className="divide-y">
-              {rows.map((row) => (
+              {listTransactions.map((row) => (
                 <div
                   key={row.id}
                   className="grid grid-cols-[1fr_120px_160px_120px_140px_100px] items-center px-6 py-4 border-b border-gray-200"
                 >
-                  {/* Descrição */}
                   <div className="flex items-center gap-3">
                     <div
                       className="flex h-10 w-10 items-center justify-center rounded-lg"
                       style={{
-                        backgroundColor: row.iconBg,
-                        color: row.iconColor,
+                        backgroundColor: row.category.color,
+                        color: "#fff",
                       }}
                     >
-                      {row.icon}
+                      {(() => {
+                        const icon = ICONS.find(
+                              (icon) => icon.name === (typeof row.category.icon === "string" ? row.category.icon : "")
+                            )
+                        return icon?.Icon ? <icon.Icon className="h-6 w-6" /> : null
+                      })()}
                     </div>
 
                     <span className="text-sm font-medium">
@@ -321,12 +248,16 @@ export function Transaction() {
                     </span>
                   </div>
 
-                  {/* Data */}
                   <span className="text-sm text-muted-foreground">
-                    {row.date}
+                    {
+                      new Date(row.date).toLocaleDateString("pt-BR", {
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                      })
+                    }
                   </span>
 
-                  {/* Categoria */}
                   <Badge
                     label={row.category.name}
                     color={row.category.color}
@@ -334,7 +265,7 @@ export function Transaction() {
 
                   {/* Tipo */}
                   <div className="flex items-center gap-2 text-sm">
-                    {row.type === "income" ? (
+                    {row.type === "INCOME" ? (
                       <>
                         <ArrowUpCircle className="h-4 w-4 text-emerald-600" />
                         <span className="text-emerald-600">Entrada</span>
@@ -349,17 +280,22 @@ export function Transaction() {
 
                   {/* Valor */}
                   <span className="text-sm font-semibold">
-                    {row.type === "income"
-                      ? `+ ${row.value}`
-                      : `- ${row.value}`}
-                  </span>
+                  {row.type === "INCOME"
+                    ? `+ R$ ${Number(row.amount).toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`
+                    : `- R$ ${Number(row.amount).toLocaleString("pt-BR", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}`}
+                </span>
 
-                  {/* Ações */}
                   <div className="flex items-center justify-end gap-2">
-                    <Button variant="outline" size="icon" className="h-9 w-9">
+                    <Button variant="outline" size="icon" className="h-9 w-9 border-none" onClick={() => deleteTransactionMutation({ variables: { id: row.id } })}>
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>
-                    <Button variant="outline" size="icon" className="h-9 w-9">
+                    <Button variant="outline" size="icon" className="h-9 w-9 border-none">
                       <Pencil className="h-4 w-4" />
                     </Button>
                   </div>

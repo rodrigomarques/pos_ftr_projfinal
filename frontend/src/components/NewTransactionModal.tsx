@@ -25,9 +25,10 @@ import { CREATE_TRANSACTION } from "@/lib/graphql/mutations/transactions/Index"
 import { useMutation, useQuery } from "@apollo/client/react"
 import { toast } from "sonner"
 import type { Category } from "@/types"
-import { LIST_CATEGORIES, LIST_CATEGORIES_SELECT } from "@/lib/graphql/queries/Categories"
+import { LIST_CATEGORIES_SELECT } from "@/lib/graphql/queries/Categories"
+import type { Transaction } from "@/pages/Transaction/Index"
+import { LIST_TRANSACTIONS } from "@/lib/graphql/queries/Transactions"
 
-// ================= SCHEMA =================
 const schema = z.object({
   description: z.string().min(1, "Informe a descrição"),
   date: z.string().min(1, "Informe a data"),
@@ -38,10 +39,10 @@ const schema = z.object({
 
 type FormData = z.infer<typeof schema>
 
-// ================= COMPONENT =================
 interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
+  transaction?: Transaction| null
 }
 
 export function NewTransactionModal({ open, onOpenChange }: Props) {
@@ -62,7 +63,10 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
   const { data} = useQuery<{ listCategories: Category[] }>(LIST_CATEGORIES_SELECT)
   const listCategories = data?.listCategories || []
 
-  const [createTransactionMutation, { loading }] = useMutation(CREATE_TRANSACTION)
+  const [createTransactionMutation, { loading }] = useMutation(CREATE_TRANSACTION,{
+    refetchQueries: [LIST_TRANSACTIONS],
+    awaitRefetchQueries: true,
+  })
   
   const onSubmit = async (data: FormData) => {
     const dataVal = new Date(data.date)
@@ -92,6 +96,7 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
     setValue("date", "")
     setValue("type", "income")
     setValue("category", "")
+    
     onOpenChange(false)
   }
 
