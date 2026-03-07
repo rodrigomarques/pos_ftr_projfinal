@@ -70,10 +70,15 @@ type Mutation {
   updateUser(data: UpdateUserInput!): UserOutput!
 }
 
+input PaginationInput {
+  limit: Int! = 10
+  page: Int! = 1
+}
+
 type Query {
   getUser(id: String!): UserOutput!
   listCategories(withStats: Boolean! = false): [CategoryModel!]!
-  listTransactions(filters: TransactionFilterInput): [TransactionModel!]!
+  listTransactions(filters: TransactionFilterInput, pagination: PaginationInput): TransactionPagination!
   listUsers: [UserOutput!]!
 }
 
@@ -96,6 +101,15 @@ type TransactionModel {
   updatedAt: DateTimeISO!
   user: UserModel
   userId: String!
+}
+
+type TransactionPagination {
+  data: [TransactionModel!]!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  page: Int!
+  total: Int!
+  totalPages: Int!
 }
 
 enum TransactionType {

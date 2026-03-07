@@ -1,6 +1,7 @@
 import { CreateTransactionInput, TransactionFilterInput, UpdateTransactionInput } from '@/dtos/input/transaction'
 import { prismaClient } from '../../prisma/prisma'
 import { Prisma } from "@generated/prisma/client"
+import { PaginationInput } from '@/dtos/input/pagination'
 
 export class TransactionService {
 
@@ -17,6 +18,78 @@ export class TransactionService {
     })
   }
 
+  async listTransactions(
+    userId: string,
+    filters?: TransactionFilterInput,
+    pagination?: PaginationInput
+  ) {
+
+    let startDate: Date | undefined
+    let endDate: Date | undefined
+
+    if (filters?.period) {
+      const [month, year] = filters.period.split("/").map(Number)
+
+      startDate = new Date(year, month - 1, 1)
+      endDate = new Date(year, month, 0, 23, 59, 59)
+    }
+
+    const page = pagination?.page ?? 1
+    const limit = pagination?.limit ?? 10
+    const skip = (page - 1) * limit
+
+    const where = {
+      userId,
+
+      ...(filters?.description && {
+        title: {
+          contains: filters.description
+        }
+      }),
+
+      ...(filters?.type && {
+        type: filters.type
+      }),
+
+      ...(filters?.categoryId && {
+        categoryId: filters.categoryId
+      }),
+
+      ...(startDate && {
+        date: {
+          gte: startDate,
+          lte: endDate
+        }
+      })
+    }
+
+    const [transactions, total] = await prismaClient.$transaction([
+      prismaClient.transaction.findMany({
+        where,
+        include: { category: true },
+        orderBy: { date: "desc" },
+        skip,
+        take: limit
+      }),
+
+      prismaClient.transaction.count({
+        where
+      })
+    ])
+
+    const totalPages = Math.ceil(total / limit)
+
+    return {
+      data: transactions,
+      total,
+      page,
+      totalPages,
+      hasNextPage: page < totalPages,
+      hasPreviousPage: page > 1
+    }
+  }
+
+  /*
   async listTransactions(userId: string, filters?: TransactionFilterInput) {
 
     let startDate: Date | undefined
@@ -64,6 +137,7 @@ export class TransactionService {
       }
     })
   }
+  */
 
   async findTransactionById(id: string, userId: string) {
     return await prismaClient.transaction.findUnique({

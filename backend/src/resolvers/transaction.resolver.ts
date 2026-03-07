@@ -4,6 +4,8 @@ import { CreateTransactionInput, TransactionFilterInput, UpdateTransactionInput 
 import { TransactionService } from '@/services/transaction.service'
 import { GraphqlContext } from '@/graphql/context'
 import { IsAuth } from '@/middlewares/auth.middleware'
+import { PaginationInput } from '@/dtos/input/pagination'
+import { TransactionPagination } from '@/dtos/output/transaction'
 
 @Resolver(() => TransactionModel)
 @UseMiddleware(IsAuth)
@@ -18,14 +20,15 @@ export class TransactionResolver {
     return await this.transactionService.createTransaction(data, ctx.user)
   }
 
-  @Query(() => [TransactionModel])
+  @Query(() => TransactionPagination)
   async listTransactions(
     @Ctx() ctx: GraphqlContext,
     @Arg("filters", () => TransactionFilterInput, { nullable: true })
-    filters?: TransactionFilterInput
-  ): Promise<TransactionModel[]> {
-
-    return this.transactionService.listTransactions(ctx.user, filters)
+    filters?: TransactionFilterInput,
+    @Arg("pagination", () => PaginationInput, { nullable: true })
+    pagination?: PaginationInput
+  ): Promise<TransactionPagination> {
+    return this.transactionService.listTransactions(ctx.user, filters, pagination)
   }
 
   @Mutation(() => Boolean)
