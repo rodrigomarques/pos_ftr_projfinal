@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select"
 import { Page } from "@/components/Page"
 import { Badge } from "@/components/Badge"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { NewTransactionModal } from "@/components/NewTransactionModal"
 import type { Category } from "../Category/Index"
 import { useMutation, useQuery } from "@apollo/client/react"
@@ -30,6 +30,8 @@ import { ICONS, type TransactionType } from "@/types"
 import { GlobalLoading } from "@/components/GlobalLoading"
 import { DELETE_TRANSACTION } from "@/lib/graphql/mutations/transactions/Index"
 import { toast } from "sonner"
+import { useDebounce } from "@/hooks/useDebounce"
+import { LIST_CATEGORIES_SELECT } from "@/lib/graphql/queries/Categories"
 
 
 export type Transaction = {
@@ -46,8 +48,51 @@ export type Transaction = {
 
 export function Transaction() {
 
-  const { data, loading } = useQuery<{ listTransactions: Transaction[] }>(LIST_TRANSACTIONS)
+  const last12Months = useMemo(() => {
+    const now = new Date()
+
+    return Array.from({ length: 12 }, (_, i) => {
+      const date = new Date(now)
+      date.setMonth(now.getMonth() - i)
+
+      const month = String(date.getMonth() + 1).padStart(2, "0")
+      const year = date.getFullYear()
+
+      const label = date.toLocaleDateString("pt-BR", {
+        month: "long",
+        year: "numeric",
+      })
+
+      return {
+        value: `${month}/${year}`,
+        label: label.charAt(0).toUpperCase() + label.slice(1),
+      }
+    })
+  }, [])
+
+  const [description, setDescription] = useState("")
+  const [type, setType] = useState<string>("all")
+  const [categoryId, setCategoryId] = useState<string>("all")
+  const [period, setPeriod] = useState(last12Months[0]?.value)
+
+  const debouncedSearch = useDebounce(description, 400)
+  const { data, loading } = useQuery<{ listTransactions: Transaction[] }>(
+    LIST_TRANSACTIONS,
+    {
+      variables: {
+        filters: {
+          ...(debouncedSearch && { description: debouncedSearch }),
+          ...(type !== "all" && { type }),
+          ...(categoryId !== "all" && { categoryId }),
+          ...(period && { period }),
+        }
+      },
+    }
+  )
   const listTransactions = data?.listTransactions || []
+
+  const { data:dataCategory } = useQuery<{ listCategories: Category[] }>(LIST_CATEGORIES_SELECT)
+  const listCategories = dataCategory?.listCategories || []
 
   const [deleteTransactionMutation, { loading: deleting }] = useMutation(DELETE_TRANSACTION, {
     onCompleted: () => {
@@ -60,13 +105,12 @@ export function Transaction() {
   const handleOpenChange = (value: boolean) => {
     setOpen(value)
   }
-
+  
   return (
     <Page>
       <GlobalLoading open={loading || deleting} /> 
       <NewTransactionModal open={open} onOpenChange={handleOpenChange}  />
       <div className="space-y-6 p-6 bg-muted/40 min-h-screen">
-        {/* HEADER */}
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-semibold">Transações</h1>
@@ -84,7 +128,6 @@ export function Transaction() {
           </Button>
         </div>
 
-        {/* FILTERS */}
         <Card className="bg-white border-none">
           <CardContent className="p-5 grid gap-4 md:grid-cols-4">
             {/* Buscar */}
@@ -94,10 +137,9 @@ export function Transaction() {
                 <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   placeholder="Buscar por descrição"
-                  className="pl-10 h-11 focus:ring-0
-                    border-gray-200
-                    focus-visible:ring-0
-                    focus-visible:ring-offset-0"
+                  className="pl-10 h-11 border-gray-200 focus-visible:ring-0"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                 />
               </div>
             </div>
@@ -105,7 +147,7 @@ export function Transaction() {
             {/* Tipo */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Tipo</label>
-              <Select defaultValue="all">
+              <Select defaultValue="all" value={type} onValueChange={setType}>
                 <SelectTrigger
                   className="
                     min-h-11
@@ -134,8 +176,8 @@ export function Transaction() {
                   className="min-w-[--radix-select-trigger-width] rounded-md border bg-white p-1 shadow-md border-gray-200"
                 >
                   <SelectItem value="all">Todos</SelectItem>
-                  <SelectItem value="income">Entrada</SelectItem>
-                  <SelectItem value="expense">Saída</SelectItem>
+                  <SelectItem value="INCOME">Entrada</SelectItem>
+                  <SelectItem value="EXPENSE">Saída</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -143,7 +185,7 @@ export function Transaction() {
             {/* Categoria */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Categoria</label>
-              <Select defaultValue="all">
+              <Select defaultValue="all" value={categoryId} onValueChange={setCategoryId}>
                 <SelectTrigger
                   className="
                     min-h-11
@@ -170,13 +212,18 @@ export function Transaction() {
                   sideOffset={4}
                   className="min-w-[--radix-select-trigger-width] rounded-md border bg-white p-1 shadow-md border-gray-200">
                   <SelectItem value="all">Todas</SelectItem>
+                  {listCategories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
               <label className="text-sm font-medium">Período</label>
-              <Select defaultValue="nov">
+              <Select value={period} onValueChange={setPeriod}>
                 <SelectTrigger
                   className="
                     min-h-11
@@ -202,7 +249,11 @@ export function Transaction() {
                   align="start"
                   sideOffset={4}
                   className="min-w-[--radix-select-trigger-width] rounded-md border bg-white p-1 shadow-md border-gray-200">
-                  <SelectItem value="nov">Novembro / 2025</SelectItem>
+                  {last12Months.map((month) => (
+                    <SelectItem key={month.value} value={month.value}>
+                      {month.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

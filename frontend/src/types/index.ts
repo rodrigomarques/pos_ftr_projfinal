@@ -96,6 +96,13 @@ export type Transaction = {
   category: Category
 }
 
+export type TransactionFilterInput = {
+  description?: string
+  type?: "INCOME" | "EXPENSE"
+  categoryId?: string
+  period?: string
+}
+
 export const ICONS = [
   { name: "bag", Icon: ShoppingBag },
   { name: "car", Icon: Car },
