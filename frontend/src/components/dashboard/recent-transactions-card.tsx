@@ -3,8 +3,7 @@ import { ChevronRight, Plus, ArrowDownCircle, ArrowUpCircle } from "lucide-react
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { NewTransactionModal } from "@/components/NewTransactionModal"
-import type { Transaction } from "@/pages/Transaction/Index"
-import { ICONS } from "@/types"
+import { ICONS, type Transaction } from "@/types"
 import { Pill } from "../Pill"
 
 export function RecentTransactionsCard({

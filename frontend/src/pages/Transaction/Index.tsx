@@ -21,30 +21,17 @@ import {
 } from "@/components/ui/select"
 import { Page } from "@/components/Page"
 import { Badge } from "@/components/Badge"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { NewTransactionModal } from "@/components/NewTransactionModal"
 import type { Category } from "../Category/Index"
 import { useMutation, useQuery } from "@apollo/client/react"
 import { LIST_TRANSACTIONS } from "@/lib/graphql/queries/Transactions"
-import { ICONS, type TransactionPagination, type TransactionType } from "@/types"
+import { ICONS, type TransactionPagination, type Transaction } from "@/types"
 import { GlobalLoading } from "@/components/GlobalLoading"
 import { DELETE_TRANSACTION } from "@/lib/graphql/mutations/transactions/Index"
 import { toast } from "sonner"
 import { useDebounce } from "@/hooks/useDebounce"
 import { LIST_CATEGORIES_SELECT } from "@/lib/graphql/queries/Categories"
-
-
-export type Transaction = {
-  id: string
-  title: string
-  date: string
-  category: Category
-  type: TransactionType
-  amount: number
-  icon: React.ReactElement
-  iconBg: string
-  iconColor: string
-}
 
 export function Transaction() {
 
@@ -74,6 +61,7 @@ export function Transaction() {
   const [type, setType] = useState<string>("all")
   const [categoryId, setCategoryId] = useState<string>("all")
   const [period, setPeriod] = useState(last12Months[0]?.value)
+  const [transaction, setTransaction] = useState<Transaction|null>(null)
 
   const [page, setPage] = useState(1)
   const limit = 20
@@ -129,14 +117,22 @@ export function Transaction() {
   })
 
   const [open, setOpen] = useState(false)
+  
+  useEffect(() => {
+    setOpen(transaction != null)
+  }, [transaction])
+
   const handleOpenChange = (value: boolean) => {
     setOpen(value)
+    if (!value) {
+      setTransaction(null)
+    }
   }
   
   return (
     <Page>
       <GlobalLoading open={loading || deleting} /> 
-      <NewTransactionModal open={open} onOpenChange={handleOpenChange}  />
+      <NewTransactionModal open={open} onOpenChange={handleOpenChange} transaction={transaction} />
       <div className="space-y-6 p-6 bg-muted/40 min-h-screen">
         <div className="flex items-start justify-between">
           <div>
@@ -370,10 +366,10 @@ export function Transaction() {
                 </span>
 
                   <div className="flex items-center justify-end gap-2">
-                    <Button variant="outline" size="icon" className="h-9 w-9 border-none" onClick={() => deleteTransactionMutation({ variables: { id: row.id } })}>
+                    <Button variant="outline" size="icon" className="h-9 w-9 border-none cursor-pointer" onClick={() => deleteTransactionMutation({ variables: { id: row.id } })}>
                       <Trash2 className="h-4 w-4 text-red-500" />
                     </Button>
-                    <Button variant="outline" size="icon" className="h-9 w-9 border-none">
+                    <Button variant="outline" size="icon" className="h-9 w-9 border-none cursor-pointer" onClick={() => setTransaction(row)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                   </div>
