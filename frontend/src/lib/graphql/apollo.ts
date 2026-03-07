@@ -4,7 +4,7 @@ import { useAuthStore } from '../../stores/auth'
 
 
 const httpLink = new HttpLink({
-  uri: "http://localhost:4001/graphql"
+  uri: import.meta.env.VITE_GRAPHQL_URL
 })
 
 const authLink = new SetContextLink((prevContext) => {

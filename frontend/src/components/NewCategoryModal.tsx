@@ -19,6 +19,7 @@ import { CREATE_CATEGORY, UPDATE_CATEGORY } from "@/lib/graphql/mutations/catego
 import { toast } from "sonner"
 import { ICONS } from "@/types"
 import type { Category } from "@/pages/Category/Index"
+import { LIST_CATEGORIES } from "@/lib/graphql/queries/Categories"
 
 // ================= SCHEMA =================
 const schema = z.object({
@@ -89,8 +90,14 @@ export function NewCategoryModal({ open, onOpenChange, refetchCategories, catego
     }
   }, [category, reset])
 
-  const [updateCategoryMutation] = useMutation(UPDATE_CATEGORY)
-  const [createCategoryMutation, { loading }] = useMutation(CREATE_CATEGORY)
+  const [updateCategoryMutation] = useMutation(UPDATE_CATEGORY, {
+    refetchQueries: [LIST_CATEGORIES],
+    awaitRefetchQueries: true,
+  })
+  const [createCategoryMutation, { loading }] = useMutation(CREATE_CATEGORY, {
+    refetchQueries: [LIST_CATEGORIES],
+    awaitRefetchQueries: true,
+  })
 
   const onSubmit = async (data: FormData) => {
     const variables = {

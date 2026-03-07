@@ -16,8 +16,8 @@
 Copy .env.example to .env
 
 Define envs
-JWT_SECRET=
-PORT=
+JWT_SECRET=""
+PORT=""
 
 npm install
 yarn dev
