@@ -8,12 +8,28 @@ import { useQuery } from "@apollo/client/react";
 import { LIST_TRANSACTIONS } from "@/lib/graphql/queries/Transactions";
 import type { Category } from "../Category/Index";
 import { LIST_CATEGORIES } from "@/lib/graphql/queries/Categories";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { currencyBRL } from "@/utils/currency";
 
 export function Dashboard() {
 
-  const { data, loading } = useQuery<{ listTransactions: Transaction[] }>(LIST_TRANSACTIONS)
+  const [period, _] = useState(() => {
+    const now = new Date()
+    const month = String(now.getMonth() + 1).padStart(2, "0")
+    const year = now.getFullYear()
+    return `${month}/${year}`
+  })
+
+  const { data } = useQuery<{ listTransactions: Transaction[] }>(
+    LIST_TRANSACTIONS,
+    {
+      variables: {
+        filters: {
+          ...(period && { period }),
+        }
+      },
+    }
+  )
   const listTransactions = useMemo(() => data?.listTransactions || [], [data])
 
   const receita = useMemo(() => 
