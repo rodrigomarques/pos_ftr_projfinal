@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -15,9 +15,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
 import { useMutation } from "@apollo/client/react"
-import { CREATE_CATEGORY } from "@/lib/graphql/mutations/categories/Save"
+import { CREATE_CATEGORY, UPDATE_CATEGORY } from "@/lib/graphql/mutations/categories/Index"
 import { toast } from "sonner"
 import { ICONS } from "@/types"
+import type { Category } from "@/pages/Category/Index"
 
 // ================= SCHEMA =================
 const schema = z.object({
@@ -48,52 +49,93 @@ interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
   refetchCategories?: () => void 
+  category?: Category| null
 }
 
-export function NewCategoryModal({ open, onOpenChange, refetchCategories }: Props) {
-  const [selectedIcon, setSelectedIcon] = useState("")
-  const [selectedColor, setSelectedColor] = useState("")
+export function NewCategoryModal({ open, onOpenChange, refetchCategories, category }: Props) {
+  const [selectedIcon, setSelectedIcon] = useState(category?.icon || "")
+  const [selectedColor, setSelectedColor] = useState(category?.color || "")
 
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
-  } = useForm<FormData>({
+    reset
+  } = useForm({
     resolver: zodResolver(schema),
-  })
+  } as const)
 
-  const [createCategoryMutation, { loading }] = useMutation(CREATE_CATEGORY, {
-    onCompleted: () => {
-      onOpenChange(false)
-      setValue("title", "")
-      setValue("description", "")
-      setValue("icon", "")
-      setValue("color", "")
+  useEffect(() => {
+    if (category) {
+      reset({
+        title: category.name,
+        description: category.description,
+        icon: category.icon,
+        color: category.color,
+      })
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSelectedIcon(category.icon)
+      setSelectedColor(category.color)
+    } else {
+      reset({
+        title: "",
+        description: "",
+        icon: "",
+        color: "",
+      })
       setSelectedIcon("")
       setSelectedColor("")
+    }
+  }, [category, reset])
+
+  const [updateCategoryMutation] = useMutation(UPDATE_CATEGORY)
+  const [createCategoryMutation, { loading }] = useMutation(CREATE_CATEGORY)
+
+  const onSubmit = async (data: FormData) => {
+    const variables = {
+      name: data.title,
+      color: data.color,
+      icon: data.icon,
+      description: data.description,
+    }
+    
+    if (category?.id) {
+      await updateCategoryMutation({
+        variables: {
+          data: {
+            id : category.id,
+            ...variables
+          }
+        },
+      })
+
+      toast.success("Categoria atualizada com sucesso!")
+    } else {
+      await createCategoryMutation({
+        variables: {
+          data: variables,
+        },
+      })
 
       toast.success("Categoria criada com sucesso!")
-      if (refetchCategories) {
-        refetchCategories()
-      }
-    },
-  })
-  const onSubmit = async (data: FormData) => {
-    await createCategoryMutation({
-      variables: {
-        data: {
-          name: data.title,
-          color: data.color,
-          icon: data.icon,
-          description: data.description,
-        },
-      },
-    })
+    }
+
+    onOpenChange(false)
+    setValue("title", "")
+    setValue("description", "")
+    setValue("icon", "")
+    setValue("color", "")
+    setSelectedIcon("")
+    setSelectedColor("")
+
+    if (refetchCategories) {
+      refetchCategories()
+    }
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} >
       <DialogContent className="sm:max-w-md bg-white border-none rounded-xl shadow-lg">
         <DialogHeader>
           <DialogTitle>Nova categoria</DialogTitle>

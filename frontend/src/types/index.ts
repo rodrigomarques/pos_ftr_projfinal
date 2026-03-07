@@ -51,6 +51,14 @@ export interface CreateCategoryInput {
   description?: string
 }
 
+export interface UpdateCategoryInput {
+  id: string
+  name: string
+  color: string
+  icon?: string
+  description?: string
+}
+
 export type Category = {
   id: string
   name: string

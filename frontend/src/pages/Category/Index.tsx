@@ -2,25 +2,21 @@ import {
   Plus,
   Tag,
   ArrowRightLeft,
-  Utensils,
-  Film,
-  PiggyBank,
-  ShoppingCart,
-  Wallet,
-  HeartPulse,
-  Car,
-  Lightbulb,
+  CircleHelp,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { StatCard } from "@/components/dashboard/stat-card"
 import { Page } from "@/components/Page"
 import { CategoryCard } from "@/components/CategoryCard"
-import { useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { NewCategoryModal } from "@/components/NewCategoryModal"
-import { useQuery } from "@apollo/client/react"
+import { useMutation, useQuery } from "@apollo/client/react"
 import { LIST_CATEGORIES } from "@/lib/graphql/queries/Categories"
 import { GlobalLoading } from "@/components/GlobalLoading"
+import { DELETE_CATEGORY } from "@/lib/graphql/mutations/categories/Index"
+import { toast } from "sonner"
+import { ICONS } from "@/types"
 
 export type Category = {
   id: string
@@ -28,7 +24,7 @@ export type Category = {
   description: string
   color: string
   items: number
-  icon: React.ReactElement
+  icon: string
   iconBg: string
   iconColor: string
 }
@@ -38,11 +34,41 @@ export default function Category() {
   const { data, loading, refetch } = useQuery<{ listCategories: Category[] }>(LIST_CATEGORIES)
   const listCategories = data?.listCategories || []
   const [open, setOpen] = useState(false)  
+
+  const [totalTransacoes, setTotalTransacoes] = useState(0)
+  const [categoryMostUsed, setCategoryMostUsed] = useState<Category|null>(null)
+  const [category, setCategory] = useState<Category|null>(null)
+
+  const [deleteCategoryMutation, { loading: deleting }] = useMutation(DELETE_CATEGORY, {
+    onCompleted: () => {
+      toast.success("Categoria deletada com sucesso!")
+    },
+    refetchQueries: [LIST_CATEGORIES],
+  })
+
+  const CategoryIcon = useMemo(() => {
+    if (!categoryMostUsed) return null
+    return ICONS.find(
+      (icon) => icon.name === (typeof categoryMostUsed.icon === "string" ? categoryMostUsed.icon : "")
+    )?.Icon ?? null
+  }, [categoryMostUsed])
+
+  useEffect(() => {
+    setOpen(category != null)
+  }, [category])
   
+  const handleOpenChange = (value: boolean) => {
+    setOpen(value)
+
+    if (!value) {
+      setCategory(null)
+    }
+  }
+
   return (
     <Page>
-      <GlobalLoading open={loading} /> 
-      <NewCategoryModal open={open} onOpenChange={setOpen}   refetchCategories={refetch} />
+      <GlobalLoading open={loading || deleting} /> 
+      <NewCategoryModal open={open} onOpenChange={handleOpenChange} category={category} refetchCategories={refetch} />
       
     <div className="space-y-6 p-6 bg-muted/40 min-h-screen">
       {/* HEADER */}
@@ -64,21 +90,21 @@ export default function Category() {
         <StatCard
           inverse
           icon={<Tag className="h-5 w-5 text-violet-600" />}
-          label="8"
+          label={listCategories.length.toString()}
           value="TOTAL DE CATEGORIAS"
         />
 
         <StatCard
           inverse
           icon={<ArrowRightLeft className="h-5 w-5 text-purple-600" />}
-          label="27"
+          label={totalTransacoes.toString()}
           value="TOTAL DE TRANSAÇÕES"
         />
 
         <StatCard
           inverse
-          icon={<Utensils className="h-5 w-5 text-blue-600" />}
-          label="Alimentação"
+          icon={CategoryIcon ? <CategoryIcon className="h-6 w-6 text-blue-600" /> : <CircleHelp className="h-6 w-6 text-blue-600" />}
+          label={categoryMostUsed?.name || "Nenhuma categoria"}
           value="CATEGORIA MAIS UTILIZADA"
         />
       </div>
@@ -86,7 +112,7 @@ export default function Category() {
       {/* GRID */}
       <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         {listCategories.map((category) => (
-          <CategoryCard key={category.id} category={category} />
+          <CategoryCard key={category.id} category={category} setCategory={setCategory} onDelete={() => deleteCategoryMutation({ variables: { id: category.id } })} />
         ))}
       </div>
     </div>

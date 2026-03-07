@@ -7,7 +7,7 @@ import { Pencil, Trash2 } from "lucide-react"
 import { ICONS } from "@/types"
 
 
-export function CategoryCard({ category }: { category: Category }) {
+export function CategoryCard({ category, onDelete, setCategory }: { category: Category, onDelete: () => void, setCategory: (category: Category) => void }) {
   const Icon = ICONS.find(
     (icon) => icon.name === (typeof category.icon === "string" ? category.icon : "")
   )?.Icon;
@@ -28,10 +28,10 @@ export function CategoryCard({ category }: { category: Category }) {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="icon" className="h-9 w-9 border-gray-200">
+            <Button variant="outline" size="icon" className="h-9 w-9 border-gray-200 cursor-pointer" onClick={onDelete}>
               <Trash2 className="h-4 w-4 text-red-500" />
             </Button>
-            <Button variant="outline" size="icon" className="h-9 w-9 border-gray-200">
+            <Button variant="outline" size="icon" className="h-9 w-9 border-gray-200 cursor-pointer" onClick={() => setCategory(category)}>
               <Pencil className="h-4 w-4" />
             </Button>
           </div>
