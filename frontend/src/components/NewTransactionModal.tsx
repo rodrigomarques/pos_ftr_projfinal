@@ -21,6 +21,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react"
+import { CREATE_TRANSACTION } from "@/lib/graphql/mutations/transactions/Index"
+import { useMutation, useQuery } from "@apollo/client/react"
+import { toast } from "sonner"
+import type { Category } from "@/types"
+import { LIST_CATEGORIES, LIST_CATEGORIES_SELECT } from "@/lib/graphql/queries/Categories"
 
 // ================= SCHEMA =================
 const schema = z.object({
@@ -54,12 +59,42 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
     },
   })
 
-  const onSubmit = (data: FormData) => {
-    console.log(data)
+  const { data} = useQuery<{ listCategories: Category[] }>(LIST_CATEGORIES_SELECT)
+  const listCategories = data?.listCategories || []
+
+  const [createTransactionMutation, { loading }] = useMutation(CREATE_TRANSACTION)
+  
+  const onSubmit = async (data: FormData) => {
+    const dataVal = new Date(data.date)
+    const amount = Number(data.amount.replace(",", "."))
+
+    const variables = {
+      title: data.description,
+      amount: amount,
+      date: dataVal.toISOString(),
+      type: data.type.toUpperCase(),
+      categoryId: data.category,
+    }
+
+    console.log(variables)
+    await createTransactionMutation({
+      variables: {
+        data: variables,
+      },
+    })
+
+    toast.success("Transação criada com sucesso!")
+    
+
+    onOpenChange(false)
+    setValue("amount", "")
+    setValue("description", "")
+    setValue("date", "")
+    setValue("type", "income")
+    setValue("category", "")
     onOpenChange(false)
   }
 
-  // ================= UI =================
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md bg-white border-none rounded-lg shadow-lg">
@@ -206,9 +241,11 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
                   align="start"
                   sideOffset={4}
                   className="min-w-[--radix-select-trigger-width] rounded-md border bg-white p-1 shadow-md border-gray-200">
-                <SelectItem value="food">Alimentação</SelectItem>
-                <SelectItem value="transport">Transporte</SelectItem>
-                <SelectItem value="market">Mercado</SelectItem>
+                  {listCategories.map((category) => (
+                    <SelectItem key={category.id} value={category.id}>
+                      {category.name}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
 
@@ -224,7 +261,7 @@ export function NewTransactionModal({ open, onOpenChange }: Props) {
             type="submit"
             className="w-full bg-emerald-700 hover:bg-emerald-800 text-white"
           >
-            Salvar
+            {loading ? "Salvando..." : "Salvar"}
           </Button>
         </form>
       </DialogContent>

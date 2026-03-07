@@ -12,3 +12,13 @@ export const LIST_CATEGORIES = gql`
       }
     }
 `
+
+
+export const LIST_CATEGORIES_SELECT = gql`
+    query ListCategories {
+      listCategories {
+        id
+        name
+      }
+    }
+`

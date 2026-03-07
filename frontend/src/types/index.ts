@@ -67,6 +67,33 @@ export type Category = {
   icon: string
 }
 
+export interface CreateTransactionInput {
+  title: string
+  amount: number
+  date: string
+  type: "expense" | "income"
+  categoryId: string
+}
+
+export interface UpdateTransactionInput {
+  id: string
+  title: string
+  amount: number
+  date: string
+  type: "expense" | "income"
+  categoryId: string
+}
+
+export type Transaction = {
+  id: string
+  title: string
+  amount: number
+  type: "expense" | "income"
+  date: string
+  categoryId: string
+  category: Category
+}
+
 export const ICONS = [
   { name: "bag", Icon: ShoppingBag },
   { name: "car", Icon: Car },
