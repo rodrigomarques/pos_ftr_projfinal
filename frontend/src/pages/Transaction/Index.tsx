@@ -26,7 +26,7 @@ import { NewTransactionModal } from "@/components/NewTransactionModal"
 import type { Category } from "../Category/Index"
 import { useMutation, useQuery } from "@apollo/client/react"
 import { LIST_TRANSACTIONS } from "@/lib/graphql/queries/Transactions"
-import { ICONS, type TransactionType } from "@/types"
+import { ICONS, type TransactionPagination, type TransactionType } from "@/types"
 import { GlobalLoading } from "@/components/GlobalLoading"
 import { DELETE_TRANSACTION } from "@/lib/graphql/mutations/transactions/Index"
 import { toast } from "sonner"
@@ -75,8 +75,11 @@ export function Transaction() {
   const [categoryId, setCategoryId] = useState<string>("all")
   const [period, setPeriod] = useState(last12Months[0]?.value)
 
+  const [page, setPage] = useState(1)
+  const limit = 20
+
   const debouncedSearch = useDebounce(description, 400)
-  const { data, loading } = useQuery<{ listTransactions: Transaction[] }>(
+  const { data, loading } = useQuery<{ listTransactions: TransactionPagination }>(
     LIST_TRANSACTIONS,
     {
       variables: {
@@ -85,14 +88,38 @@ export function Transaction() {
           ...(type !== "all" && { type }),
           ...(categoryId !== "all" && { categoryId }),
           ...(period && { period }),
-        }
+        },
+        pagination: {
+          page,
+          limit,
+        },
       },
     }
   )
-  const listTransactions = data?.listTransactions || []
+  const pagination = data?.listTransactions
+  const listTransactions = pagination?.data || []
 
   const { data:dataCategory } = useQuery<{ listCategories: Category[] }>(LIST_CATEGORIES_SELECT)
   const listCategories = dataCategory?.listCategories || []
+
+  const visiblePages = useMemo(() => {
+    const totalPages = data?.listTransactions.totalPages ?? 0
+    const maxPages = 5
+
+    if (totalPages <= maxPages) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1)
+    }
+
+    let start = Math.max(page - 2, 1)
+    let end = start + maxPages - 1
+
+    if (end > totalPages) {
+      end = totalPages
+      start = end - maxPages + 1
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i)
+  }, [page, data])
 
   const [deleteTransactionMutation, { loading: deleting }] = useMutation(DELETE_TRANSACTION, {
     onCompleted: () => {
@@ -357,26 +384,44 @@ export function Transaction() {
             {/* Footer */}
             <div className="flex items-center justify-between px-6 py-4">
               <span className="text-sm text-muted-foreground">
-                1 a 10 | 27 resultados
+                {(page - 1) * limit + 1} a{" "}
+                {Math.min(page * limit, pagination?.total ?? 0)} |{" "}
+                {pagination?.total ?? 0} resultados
               </span>
 
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="icon" className="h-8 w-8">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 cursor-pointer"
+                  disabled={!pagination?.hasPreviousPage}
+                  onClick={() => setPage((p) => p - 1)}
+                >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
 
-                <Button className="h-8 w-8 bg-emerald-700 text-white">
-                  1
-                </Button>
+                {visiblePages.map((p) => (
+                  <Button
+                    key={p}
+                    className={`h-8 w-8 cursor-pointer ${
+                      p === page
+                        ? "bg-emerald-700 text-white"
+                        : "variant-outline"
+                    }`}
+                    variant={p === page ? "default" : "outline"}
+                    onClick={() => setPage(p)}
+                  >
+                    {p}
+                  </Button>
+                ))}
 
-                <Button variant="outline" className="h-8 w-8">
-                  2
-                </Button>
-                <Button variant="outline" className="h-8 w-8">
-                  3
-                </Button>
-
-                <Button variant="outline" size="icon" className="h-8 w-8">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="h-8 w-8 cursor-pointer"
+                  disabled={!pagination?.hasNextPage}
+                  onClick={() => setPage((p) => p + 1)}
+                >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
               </div>

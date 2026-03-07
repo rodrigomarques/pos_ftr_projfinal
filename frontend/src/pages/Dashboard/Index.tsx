@@ -5,7 +5,7 @@ import { Page } from "@/components/Page";
 import { ArrowDownCircle, ArrowUpCircle, Wallet } from "lucide-react";
 import type { Transaction } from "../Transaction/Index";
 import { useQuery } from "@apollo/client/react";
-import { LIST_TRANSACTIONS } from "@/lib/graphql/queries/Transactions";
+import { LIST_TRANSACTIONS_DASH } from "@/lib/graphql/queries/Transactions";
 import type { Category } from "../Category/Index";
 import { LIST_CATEGORIES } from "@/lib/graphql/queries/Categories";
 import { useMemo, useState } from "react";
@@ -20,8 +20,8 @@ export function Dashboard() {
     return `${month}/${year}`
   })
 
-  const { data } = useQuery<{ listTransactions: Transaction[] }>(
-    LIST_TRANSACTIONS,
+  const { data } = useQuery<{ listTransactions: { data: Transaction[] } }>(
+    LIST_TRANSACTIONS_DASH,
     {
       variables: {
         filters: {
@@ -30,7 +30,7 @@ export function Dashboard() {
       },
     }
   )
-  const listTransactions = useMemo(() => data?.listTransactions || [], [data])
+  const listTransactions = useMemo(() => data?.listTransactions.data || [], [data])
 
   const receita = useMemo(() => 
     listTransactions.filter(tx => tx.type === "INCOME").reduce((acc, tx) => acc + Number(tx.amount), 0),

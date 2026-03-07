@@ -103,6 +103,15 @@ export type TransactionFilterInput = {
   period?: string
 }
 
+export type TransactionPagination = {
+  data: Transaction[]
+  total: number
+  page: number
+  totalPages: number
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+}
+
 export const ICONS = [
   { name: "bag", Icon: ShoppingBag },
   { name: "car", Icon: Car },
