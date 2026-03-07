@@ -13,27 +13,11 @@ import {
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  ShoppingBag,
-  Car,
-  Heart,
-  PiggyBank,
-  ShoppingCart,
-  Ticket,
-  Gift,
-  Utensils,
-  Sparkles,
-  Home,
-  Package,
-  BookOpen,
-  Dumbbell,
-  Bus,
-  CreditCard,
-  Receipt,
-} from "lucide-react"
+
 import { useMutation } from "@apollo/client/react"
 import { CREATE_CATEGORY } from "@/lib/graphql/mutations/categories/Save"
 import { toast } from "sonner"
+import { ICONS } from "@/types"
 
 // ================= SCHEMA =================
 const schema = z.object({
@@ -46,24 +30,7 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>
 
 // ================= ICONS =================
-const ICONS = [
-  { name: "bag", Icon: ShoppingBag },
-  { name: "car", Icon: Car },
-  { name: "heart", Icon: Heart },
-  { name: "pig", Icon: PiggyBank },
-  { name: "cart", Icon: ShoppingCart },
-  { name: "ticket", Icon: Ticket },
-  { name: "gift", Icon: Gift },
-  { name: "food", Icon: Utensils },
-  { name: "spark", Icon: Sparkles },
-  { name: "home", Icon: Home },
-  { name: "box", Icon: Package },
-  { name: "book", Icon: BookOpen },
-  { name: "gym", Icon: Dumbbell },
-  { name: "bus", Icon: Bus },
-  { name: "card", Icon: CreditCard },
-  { name: "receipt", Icon: Receipt },
-]
+
 
 // ================= COLORS =================
 const COLORS = [
@@ -80,9 +47,10 @@ const COLORS = [
 interface Props {
   open: boolean
   onOpenChange: (open: boolean) => void
+  refetchCategories?: () => void 
 }
 
-export function NewCategoryModal({ open, onOpenChange }: Props) {
+export function NewCategoryModal({ open, onOpenChange, refetchCategories }: Props) {
   const [selectedIcon, setSelectedIcon] = useState("")
   const [selectedColor, setSelectedColor] = useState("")
 
@@ -106,6 +74,9 @@ export function NewCategoryModal({ open, onOpenChange }: Props) {
       setSelectedColor("")
 
       toast.success("Categoria criada com sucesso!")
+      if (refetchCategories) {
+        refetchCategories()
+      }
     },
   })
   const onSubmit = async (data: FormData) => {
@@ -114,8 +85,8 @@ export function NewCategoryModal({ open, onOpenChange }: Props) {
         data: {
           name: data.title,
           color: data.color,
-          type: "EXPENSE",
-          icon: data.icon
+          icon: data.icon,
+          description: data.description,
         },
       },
     })

@@ -1,4 +1,3 @@
-import { UUID } from 'node:crypto'
 import { prismaClient } from '../../prisma/prisma'
 import { CreateCategoryInput, UpdateCategoryInput } from '@/dtos/input/category'
 
@@ -17,7 +16,7 @@ export class CategoryService {
       data: {
         name: data.name,
         color: data.color,
-        type: data.type,
+        description: data.description,
         icon: data.icon,
         userId: userId
       },
@@ -33,7 +32,7 @@ export class CategoryService {
       data: {
         name: data.name,
         color: data.color,
-        type: data.type,
+        description: data.description,
         icon: data.icon
       }
     })

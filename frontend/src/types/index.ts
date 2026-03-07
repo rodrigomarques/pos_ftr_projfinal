@@ -1,3 +1,22 @@
+import {
+  ShoppingBag,
+  Car,
+  Heart,
+  PiggyBank,
+  ShoppingCart,
+  Ticket,
+  Gift,
+  Utensils,
+  Sparkles,
+  Home,
+  Package,
+  BookOpen,
+  Dumbbell,
+  Bus,
+  CreditCard,
+  Receipt,
+} from "lucide-react"
+
 export interface User {
   id: string
   name: string
@@ -28,6 +47,33 @@ export interface UpdateUserInput {
 export interface CreateCategoryInput {
   name: string
   color: string
-  type: string
   icon?: string
+  description?: string
 }
+
+export type Category = {
+  id: string
+  name: string
+  description: string
+  color: string
+  icon: string
+}
+
+export const ICONS = [
+  { name: "bag", Icon: ShoppingBag },
+  { name: "car", Icon: Car },
+  { name: "heart", Icon: Heart },
+  { name: "pig", Icon: PiggyBank },
+  { name: "cart", Icon: ShoppingCart },
+  { name: "ticket", Icon: Ticket },
+  { name: "gift", Icon: Gift },
+  { name: "food", Icon: Utensils },
+  { name: "spark", Icon: Sparkles },
+  { name: "home", Icon: Home },
+  { name: "box", Icon: Package },
+  { name: "book", Icon: BookOpen },
+  { name: "gym", Icon: Dumbbell },
+  { name: "bus", Icon: Bus },
+  { name: "card", Icon: CreditCard },
+  { name: "receipt", Icon: Receipt },
+]

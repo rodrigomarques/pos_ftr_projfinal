@@ -4,9 +4,14 @@ import { Badge } from "@/components/Badge"
 import type { Category } from "@/pages/Category/Index"
 import { Button } from "./ui/button"
 import { Pencil, Trash2 } from "lucide-react"
+import { ICONS } from "@/types"
 
 
 export function CategoryCard({ category }: { category: Category }) {
+  const Icon = ICONS.find(
+    (icon) => icon.name === (typeof category.icon === "string" ? category.icon : "")
+  )?.Icon;
+
   return (
     <Card className="rounded-xl border-none bg-white">
       <CardContent className="pl-5 pr-5 space-y-3">
@@ -15,11 +20,11 @@ export function CategoryCard({ category }: { category: Category }) {
           <div
             className="flex h-10 w-10 items-center justify-center rounded-lg"
             style={{
-              backgroundColor: category.iconBg,
-              color: category.iconColor,
+              backgroundColor: category.color,
+              color: "#fff",
             }}
           >
-            {category.icon}
+            {Icon && <Icon className="h-4 w-4" />}
           </div>
 
           <div className="flex items-center gap-2">

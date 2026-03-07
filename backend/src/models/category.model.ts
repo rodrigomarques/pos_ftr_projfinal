@@ -16,8 +16,8 @@ export class CategoryModel {
   @Field(() => String,  { nullable: true })
   icon?: string
 
-  @Field(() => String, { nullable: false })
-  type!: string
+  @Field(() => String,  { nullable: true })
+  description?: string
 
   @Field(() => String)
   userId!: string
