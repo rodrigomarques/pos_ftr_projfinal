@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { ArrowDownCircle, ArrowUpCircle } from "lucide-react"
-import { CREATE_TRANSACTION } from "@/lib/graphql/mutations/transactions/Index"
+import { CREATE_TRANSACTION, UPDATE_TRANSACTION } from "@/lib/graphql/mutations/transactions/Index"
 import { useMutation, useQuery } from "@apollo/client/react"
 import { toast } from "sonner"
 import type { Category, Transaction } from "@/types"
@@ -105,6 +105,10 @@ export function NewTransactionModal({ open, onOpenChange, transaction }: Props) 
   const { data} = useQuery<{ listCategories: Category[] }>(LIST_CATEGORIES_SELECT)
   const listCategories = data?.listCategories || []
 
+  const [updateTransaction] = useMutation(UPDATE_TRANSACTION, {
+    refetchQueries: [LIST_TRANSACTIONS],
+    awaitRefetchQueries: true,
+  })
   const [createTransactionMutation, { loading }] = useMutation(CREATE_TRANSACTION,{
     refetchQueries: [LIST_TRANSACTIONS],
     awaitRefetchQueries: true,
@@ -122,14 +126,26 @@ export function NewTransactionModal({ open, onOpenChange, transaction }: Props) 
       categoryId: data.category,
     }
 
-    await createTransactionMutation({
-      variables: {
-        data: variables,
-      },
-    })
+    if (transaction?.id) {
+      await updateTransaction({
+        variables: {
+          data: {
+            id : transaction.id,
+            ...variables
+          }
+        },
+      })
 
-    toast.success("Transação criada com sucesso!")
-    
+      toast.success("Transação atualizada com sucesso!")
+    } else {
+      await createTransactionMutation({
+        variables: {
+          data: variables,
+        },
+      })
+      toast.success("Transação criada com sucesso!")
+    }
+
 
     onOpenChange(false)
     setValue("amount", "")
@@ -152,7 +168,6 @@ export function NewTransactionModal({ open, onOpenChange, transaction }: Props) 
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* Toggle tipo */}
           <div className="grid grid-cols-2 gap-2 rounded-lg bg-muted p-1">
             <button
               type="button"
